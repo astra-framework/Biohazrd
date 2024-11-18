@@ -139,7 +139,7 @@ namespace Biohazrd.Transformation.Common
             }
         }
 
-        private TypeTransformationResult HandleFunctionProtoType(in TypeTransformationContext context, FunctionProtoType functionType)
+        private TypeTransformationResult HandleFunctionProtoType(TypeTransformationContext context, FunctionProtoType functionType)
         {
             TypeTransformationResult result = VoidTypeReference.Instance;
 

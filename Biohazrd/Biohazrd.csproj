@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <!-- The Biohazrd package is an all-in-one package which brings in everything so we need to disambiguate this one. -->
     <PackageId>Biohazrd.Core</PackageId>
     <PackageDescription>This package provides core functionality for parsing C/C++ libraries.</PackageDescription>
