@@ -1,4 +1,6 @@
-﻿namespace Biohazrd.Expressions
+﻿using System.Globalization;
+
+namespace Biohazrd.Expressions
 {
     public sealed record FloatConstant : ConstantValue
     {
@@ -8,6 +10,6 @@
             => Value = value;
 
         public override string ToString()
-            => Value.ToString("G9");
+            => Value.ToString("G9", CultureInfo.InvariantCulture);
     }
 }

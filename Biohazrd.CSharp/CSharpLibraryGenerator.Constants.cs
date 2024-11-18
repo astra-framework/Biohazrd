@@ -82,7 +82,7 @@ namespace Biohazrd.CSharp
                         // https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings#the-round-trip-r-format-specifier
                         // The explicit d suffix is not commonly used, but it makes a double constant without the a decimal point.
                         // https://github.com/dotnet/csharplang/blob/8e7d390f6deaec0a01f690f9689ebf93903f4b00/spec/lexical-structure.md#real-literals
-                        return $"{value:G17}d";
+                        return $"{value.ToString("G17", System.Globalization.CultureInfo.InvariantCulture)}d";
                     }
                 }
                 case FloatConstant floatConstant:
@@ -116,7 +116,7 @@ namespace Biohazrd.CSharp
                         Debug.Assert(float.IsFinite(value), $"The float must be finite at this point!");
                         // G9 is the recommended format specifier for round-trippable floats
                         // https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings#the-round-trip-r-format-specifier
-                        return $"{value:G9}f";
+                        return $"{value.ToString("G9", System.Globalization.CultureInfo.InvariantCulture)}f";
                     }
                 }
                 case StringConstant stringConstant:
