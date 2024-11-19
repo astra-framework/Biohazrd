@@ -63,8 +63,10 @@ namespace Biohazrd.CSharp
             EmitFunctionContext emitContext = new(context, declaration);
 
             // Emit the DllImport
-            if (!declaration.IsVirtual)
-            { EmitFunctionDllImport(context, emitContext, declaration); }
+            if (!declaration.IsVirtual) // TODO: Add LibraryImport support for virtual functions
+            {
+                EmitFunctionDllImport(context, emitContext, declaration);
+            }
 
             // Emit the trampoline
             if (emitContext.NeedsTrampoline)

@@ -105,10 +105,15 @@ public abstract class Adapter
         return parameter.MatchesId(TargetDeclaration);
     }
 
-    public virtual void WriteInputType(TrampolineContext context, CSharpCodeWriter writer)
+    public virtual void WriteInputType(TrampolineContext context, CSharpCodeWriter writer, bool dllImport = true)
     {
         if (!AcceptsInput)
         { throw new InvalidOperationException("This adapter does not accept input."); }
+
+        if (InputType.IsCSharpType(context.Context.Library, CSharpBuiltinType.Bool) && dllImport == false)
+        {
+            context.Writer.Write("[MarshalAs(UnmanagedType.I1)] ");
+        }
 
         context.WriteType(InputType);
     }
@@ -188,9 +193,9 @@ public abstract class Adapter
         }
     }
 
-    public virtual void WriteInputParameter(TrampolineContext context, CSharpCodeWriter writer, bool emitDefaultValue)
+    public virtual void WriteInputParameter(TrampolineContext context, CSharpCodeWriter writer, bool emitDefaultValue, bool dllImport = true)
     {
-        WriteInputType(context, writer);
+        WriteInputType(context, writer, dllImport);
         writer.Write(' ');
         writer.WriteIdentifier(Name);
 

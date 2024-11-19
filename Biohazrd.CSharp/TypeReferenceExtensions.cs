@@ -20,5 +20,22 @@
                     return false;
             }
         }
+
+
+        internal static bool IsAnyCSharpType(this TypeReference typeReference, TranslatedLibrary library)
+        {
+            switch (typeReference)
+            {
+                case CSharpBuiltinTypeReference _:
+                    return true;
+                case TranslatedTypeReference translatedTypeReference:
+                    if (translatedTypeReference.TryResolve(library) is TranslatedTypedef typedef)
+                    { return IsAnyCSharpType(typedef.UnderlyingType, library); }
+                    else
+                    { return false; }
+                default:
+                    return false;
+            }
+        }
     }
 }

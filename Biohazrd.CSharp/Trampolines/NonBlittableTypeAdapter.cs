@@ -27,7 +27,7 @@ public sealed class NonBlittableTypeAdapter : Adapter
     public override bool CanEmitDefaultValue(TranslatedLibrary library)
         => false;
 
-    public override void WriteInputType(TrampolineContext context, CSharpCodeWriter writer)
+    public override void WriteInputType(TrampolineContext context, CSharpCodeWriter writer, bool dllImport = true)
     {
         writer.Using(context.Options.InfrastructureTypesNamespace);
         (context.OutputGenerator as ICSharpOutputGeneratorInternal)?.__IndicateInfrastructureTypeDependency(Kind);

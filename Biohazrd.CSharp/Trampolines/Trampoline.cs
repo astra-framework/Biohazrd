@@ -215,22 +215,48 @@ public sealed record Trampoline
             }
         }
 
+        // If the function has parameters not supported by LibraryImport such as Vector2, then use DllImport
+        bool useDllImport = true;
+        if (outputGenerator.Options.TargetRuntime >= TargetRuntime.Net7)
+        {
+            useDllImport = declaration.Parameters.Any(p => p.Type.IsAnyCSharpType(context.Library));
+        }
+
         // Emit DllImport attribute
         if (IsNativeFunction)
         {
             writer.Using("System.Runtime.InteropServices");
-            writer.Write($"[DllImport(\"{SanitizeStringLiteral(declaration.DllFileName)}\", CallingConvention = CallingConvention.{declaration.CallingConvention}");
-
-            if (declaration.MangledName != Name)
-            { writer.Write($", EntryPoint = \"{SanitizeStringLiteral(declaration.MangledName)}\""); }
-
-            if (UseLegacySetLastError)
+            if (useDllImport)
             {
-                //Debug.Assert(outputGenerator.Options.TargetRuntime < TargetRuntime.Net6);
-                writer.Write(", SetLastError = true");
-            }
+                writer.Write($"[DllImport(\"{SanitizeStringLiteral(declaration.DllFileName)}\", CallingConvention = CallingConvention.{declaration.CallingConvention}");
 
-            writer.WriteLine(", ExactSpelling = true)]");
+                if (declaration.MangledName != Name)
+                { writer.Write($", EntryPoint = \"{SanitizeStringLiteral(declaration.MangledName)}\""); }
+
+                if (UseLegacySetLastError)
+                {
+                    //Debug.Assert(outputGenerator.Options.TargetRuntime < TargetRuntime.Net6);
+                    writer.Write(", SetLastError = true");
+                }
+
+                writer.WriteLine(", ExactSpelling = true)]");
+            }
+            else
+            {
+                writer.Using("System.Runtime.CompilerServices");
+                writer.Write($"[LibraryImport(\"{SanitizeStringLiteral(declaration.DllFileName)}\"");
+
+                if (declaration.MangledName != Name)
+                { writer.Write($", EntryPoint = \"{SanitizeStringLiteral(declaration.MangledName)}\""); }
+
+                writer.WriteLine(")]");
+                writer.WriteLine("[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]");
+
+                if (declaration.ReturnType.IsCSharpType(context.Library, CSharpBuiltinType.Bool))
+                {
+                    writer.WriteLine("[return: MarshalAs(UnmanagedType.I1)]");
+                }
+            }
         }
         else
         {
@@ -270,8 +296,11 @@ public sealed record Trampoline
                 { writer.Write(" static"); }
 
                 // Write out extern if this is the P/Invoke
+                /*if (IsNativeFunction)
+                { writer.Write(" extern"); }*/
+
                 if (IsNativeFunction)
-                { writer.Write(" extern"); }
+                { writer.Write(useDllImport ? " extern" : " partial"); }
 
                 // Write out the return type
                 writer.Write(' ');
@@ -335,7 +364,7 @@ public sealed record Trampoline
                     { writer.Write(", "); }
 
                     bool emitDefaultValue = !skipDefaultValues && adapterIndex >= firstDefaultableInput;
-                    adapter.WriteInputParameter(adapterContexts[adapterIndex], writer, emitDefaultValue);
+                    adapter.WriteInputParameter(adapterContexts[adapterIndex], writer, emitDefaultValue, useDllImport);
                 }
 
                 if (IsNativeFunction)
