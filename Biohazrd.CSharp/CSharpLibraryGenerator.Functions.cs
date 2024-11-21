@@ -1,5 +1,6 @@
 ﻿using Biohazrd.CSharp.Metadata;
 using Biohazrd.CSharp.Trampolines;
+using Biohazrd.Extensions;
 using ClangSharp.Pathogen;
 using System;
 using System.Diagnostics;
@@ -98,7 +99,7 @@ namespace Biohazrd.CSharp
 
             // Write out the DllImport attribute
             Writer.Using("System.Runtime.InteropServices");
-            Writer.Write($"[DllImport(\"{SanitizeStringLiteral(declaration.DllFileName)}\", CallingConvention = CallingConvention.{declaration.CallingConvention}");
+            Writer.Write($"[DllImport(\"{SanitizeStringLiteral(declaration.DllFileName.RemoveFileExtension())}\", CallingConvention = CallingConvention.{declaration.CallingConvention}");
 
             if (declaration.MangledName != emitContext.DllImportName)
             { Writer.Write($", EntryPoint = \"{SanitizeStringLiteral(declaration.MangledName)}\""); }

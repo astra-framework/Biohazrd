@@ -1,5 +1,6 @@
 ﻿using Biohazrd.CSharp.Infrastructure;
 using Biohazrd.CSharp.Metadata;
+using Biohazrd.Extensions;
 using System;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -228,7 +229,7 @@ public sealed record Trampoline
             writer.Using("System.Runtime.InteropServices");
             if (useDllImport)
             {
-                writer.Write($"[DllImport(\"{SanitizeStringLiteral(declaration.DllFileName)}\", CallingConvention = CallingConvention.{declaration.CallingConvention}");
+                writer.Write($"[DllImport(\"{SanitizeStringLiteral(declaration.DllFileName.RemoveFileExtension())}\", CallingConvention = CallingConvention.{declaration.CallingConvention}");
 
                 if (declaration.MangledName != Name)
                 { writer.Write($", EntryPoint = \"{SanitizeStringLiteral(declaration.MangledName)}\""); }
@@ -244,7 +245,7 @@ public sealed record Trampoline
             else
             {
                 writer.Using("System.Runtime.CompilerServices");
-                writer.Write($"[LibraryImport(\"{SanitizeStringLiteral(declaration.DllFileName)}\"");
+                writer.Write($"[LibraryImport(\"{SanitizeStringLiteral(declaration.DllFileName.RemoveFileExtension())}\"");
 
                 if (declaration.MangledName != Name)
                 { writer.Write($", EntryPoint = \"{SanitizeStringLiteral(declaration.MangledName)}\""); }
